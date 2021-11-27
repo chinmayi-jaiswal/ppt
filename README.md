@@ -1,1 +1,1 @@
-# ppt
+# Salary Prediction using Linear Regression
