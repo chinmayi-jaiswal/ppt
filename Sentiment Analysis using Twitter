@@ -1,0 +1,807 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Untitled1.ipynb",
+      "provenance": [],
+      "collapsed_sections": [],
+      "toc_visible": true,
+      "authorship_tag": "ABX9TyMi9sENTmrG/K35zw60a0x/",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/chinmayi-jaiswal/ppt/blob/main/Sentiment%20Analysis%20using%20Twitter\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "6YYxUEX82WDg"
+      },
+      "source": [
+        "import sklearn\n",
+        "import numpy as np\n",
+        "import pandas as pd"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "AeeNDxnD2lqW"
+      },
+      "source": [
+        "# training data\n",
+        "train = pd.read_csv(\"/content/train.csv\")\n",
+        "\n",
+        "# test data\n",
+        "test = pd.read_csv(\"/content/test.csv\")"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 206
+        },
+        "id": "ddpQch2z2q_g",
+        "outputId": "cc790871-e7b4-4183-aed0-395c34882e63"
+      },
+      "source": [
+        "train.head()"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>id</th>\n",
+              "      <th>label</th>\n",
+              "      <th>tweet</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>@user when a father is dysfunctional and is s...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>2</td>\n",
+              "      <td>0</td>\n",
+              "      <td>@user @user thanks for #lyft credit i can't us...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>3</td>\n",
+              "      <td>0</td>\n",
+              "      <td>bihday your majesty</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>4</td>\n",
+              "      <td>0</td>\n",
+              "      <td>#model   i love u take with u all the time in ...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>5</td>\n",
+              "      <td>0</td>\n",
+              "      <td>factsguide: society now    #motivation</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "   id  label                                              tweet\n",
+              "0   1      0   @user when a father is dysfunctional and is s...\n",
+              "1   2      0  @user @user thanks for #lyft credit i can't us...\n",
+              "2   3      0                                bihday your majesty\n",
+              "3   4      0  #model   i love u take with u all the time in ...\n",
+              "4   5      0             factsguide: society now    #motivation"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 3
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "uusjKXFG477-"
+      },
+      "source": [
+        ""
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "hFpx02xS48Vx"
+      },
+      "source": [
+        ""
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 206
+        },
+        "id": "gTJx-E0J2udQ",
+        "outputId": "dbde7bc9-ad8a-4897-8561-ee5c56ee8823"
+      },
+      "source": [
+        "test.tail()"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>id</th>\n",
+              "      <th>tweet</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>17192</th>\n",
+              "      <td>49155</td>\n",
+              "      <td>thought factory: left-right polarisation! #tru...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>17193</th>\n",
+              "      <td>49156</td>\n",
+              "      <td>feeling like a mermaid ð #hairflip #neverre...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>17194</th>\n",
+              "      <td>49157</td>\n",
+              "      <td>#hillary #campaigned today in #ohio((omg)) &amp;am...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>17195</th>\n",
+              "      <td>49158</td>\n",
+              "      <td>happy, at work conference: right mindset leads...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>17196</th>\n",
+              "      <td>49159</td>\n",
+              "      <td>my   song \"so glad\" free download!  #shoegaze ...</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "          id                                              tweet\n",
+              "17192  49155  thought factory: left-right polarisation! #tru...\n",
+              "17193  49156  feeling like a mermaid ð #hairflip #neverre...\n",
+              "17194  49157  #hillary #campaigned today in #ohio((omg)) &am...\n",
+              "17195  49158  happy, at work conference: right mindset leads...\n",
+              "17196  49159  my   song \"so glad\" free download!  #shoegaze ..."
+            ]
+          },
+          "metadata": {},
+          "execution_count": 4
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "XsLDxsiw5nQd",
+        "outputId": "859cdf4b-2d98-4d91-e17c-3e8131539e6b"
+      },
+      "source": [
+        "train.info()"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "<class 'pandas.core.frame.DataFrame'>\n",
+            "RangeIndex: 31962 entries, 0 to 31961\n",
+            "Data columns (total 4 columns):\n",
+            " #   Column       Non-Null Count  Dtype \n",
+            "---  ------       --------------  ----- \n",
+            " 0   id           31962 non-null  int64 \n",
+            " 1   label        31962 non-null  int64 \n",
+            " 2   tweet        31962 non-null  object\n",
+            " 3   clean_tweet  31962 non-null  object\n",
+            "dtypes: int64(2), object(2)\n",
+            "memory usage: 998.9+ KB\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "TDpVH3Vv2zkI",
+        "outputId": "64832fef-e051-45b3-9e43-f7d5a6965e4b"
+      },
+      "source": [
+        "# non-racist/sexist related tweets\n",
+        "sum(train[\"label\"] == 0)"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "29720"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 5
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "g9wefVJ12435",
+        "outputId": "b4ff63d7-1914-42c1-b80f-b334b5e5dce7"
+      },
+      "source": [
+        "# racist/sexist related tweets\n",
+        "sum(train[\"label\"] == 1)"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "2242"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 6
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "6LGXw9GR289T",
+        "outputId": "4d119ede-73d9-4f42-aa9e-69975a7f6cb1"
+      },
+      "source": [
+        "# check if there are any missing values\n",
+        "train.isnull().sum()\n",
+        "#train.isnull().values.any()"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "id       0\n",
+              "label    0\n",
+              "tweet    0\n",
+              "dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 7
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "VN5QHLUV3Aka",
+        "outputId": "4ec307fd-87af-4a68-d8cd-7ae5bb9e8944"
+      },
+      "source": [
+        "#install tweet-preprocessor to clean tweets\n",
+        "!pip install tweet-preprocessor"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Collecting tweet-preprocessor\n",
+            "  Downloading tweet_preprocessor-0.6.0-py3-none-any.whl (27 kB)\n",
+            "Installing collected packages: tweet-preprocessor\n",
+            "Successfully installed tweet-preprocessor-0.6.0\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "NoMxKN3V3D7W"
+      },
+      "source": [
+        "# remove special characters using the regular expression library\n",
+        "import re\n",
+        "\n",
+        "#set up punctuations we want to be replaced\n",
+        "REPLACE_NO_SPACE = re.compile(\"(\\.)|(\\;)|(\\:)|(\\!)|(\\')|(\\?)|(\\,)|(\\\")|(\\|)|(\\()|(\\))|(\\[)|(\\])|(\\%)|(\\$)|(\\>)|(\\<)|(\\{)|(\\})\")\n",
+        "REPLACE_WITH_SPACE = re.compile(\"(<br\\s/><br\\s/?)|(-)|(/)|(:).\")"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "HrPkvNZu3NGU"
+      },
+      "source": [
+        "import preprocessor as p\n",
+        "\n",
+        "# custum function to clean the dataset (combining tweet_preprocessor and reguar expression)\n",
+        "def clean_tweets(df):\n",
+        "  tempArr = []\n",
+        "  for line in df:\n",
+        "    # send to tweet_processor\n",
+        "    tmpL = p.clean(line)\n",
+        "    # remove puctuation\n",
+        "    tmpL = REPLACE_NO_SPACE.sub(\"\", tmpL.lower()) # convert all tweets to lower cases\n",
+        "    tmpL = REPLACE_WITH_SPACE.sub(\" \", tmpL)\n",
+        "    tempArr.append(tmpL)\n",
+        "  return tempArr"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "lE-SpTll3RH7"
+      },
+      "source": [
+        "# clean training data\n",
+        "train_tweet = clean_tweets(train[\"tweet\"])\n",
+        "train_tweet = pd.DataFrame(train_tweet)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 363
+        },
+        "id": "J9xMoXQO3WKI",
+        "outputId": "7f92a078-a16d-4140-b000-c3e8e7764988"
+      },
+      "source": [
+        "# append cleaned tweets to the training data\n",
+        "train[\"clean_tweet\"] = train_tweet\n",
+        "\n",
+        "# compare the cleaned and uncleaned tweets\n",
+        "train.head(10)"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>id</th>\n",
+              "      <th>label</th>\n",
+              "      <th>tweet</th>\n",
+              "      <th>clean_tweet</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>1</td>\n",
+              "      <td>0</td>\n",
+              "      <td>@user when a father is dysfunctional and is s...</td>\n",
+              "      <td>when a father is dysfunctional and is so selfi...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>2</td>\n",
+              "      <td>0</td>\n",
+              "      <td>@user @user thanks for #lyft credit i can't us...</td>\n",
+              "      <td>thanks for credit i cant use cause they dont o...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>3</td>\n",
+              "      <td>0</td>\n",
+              "      <td>bihday your majesty</td>\n",
+              "      <td>bihday your majesty</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>4</td>\n",
+              "      <td>0</td>\n",
+              "      <td>#model   i love u take with u all the time in ...</td>\n",
+              "      <td>i love u take with u all the time in ur</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>5</td>\n",
+              "      <td>0</td>\n",
+              "      <td>factsguide: society now    #motivation</td>\n",
+              "      <td>factsguide society now</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>5</th>\n",
+              "      <td>6</td>\n",
+              "      <td>0</td>\n",
+              "      <td>[2/2] huge fan fare and big talking before the...</td>\n",
+              "      <td>2 2 huge fan fare and big talking before they ...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>6</th>\n",
+              "      <td>7</td>\n",
+              "      <td>0</td>\n",
+              "      <td>@user camping tomorrow @user @user @user @use...</td>\n",
+              "      <td>camping tomorrow danny</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>7</th>\n",
+              "      <td>8</td>\n",
+              "      <td>0</td>\n",
+              "      <td>the next school year is the year for exams.ð...</td>\n",
+              "      <td>the next school year is the year for exams can...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>8</th>\n",
+              "      <td>9</td>\n",
+              "      <td>0</td>\n",
+              "      <td>we won!!! love the land!!! #allin #cavs #champ...</td>\n",
+              "      <td>we won love the land</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>9</th>\n",
+              "      <td>10</td>\n",
+              "      <td>0</td>\n",
+              "      <td>@user @user welcome here !  i'm   it's so #gr...</td>\n",
+              "      <td>welcome here  im its so</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "   id  ...                                        clean_tweet\n",
+              "0   1  ...  when a father is dysfunctional and is so selfi...\n",
+              "1   2  ...  thanks for credit i cant use cause they dont o...\n",
+              "2   3  ...                                bihday your majesty\n",
+              "3   4  ...            i love u take with u all the time in ur\n",
+              "4   5  ...                             factsguide society now\n",
+              "5   6  ...  2 2 huge fan fare and big talking before they ...\n",
+              "6   7  ...                             camping tomorrow danny\n",
+              "7   8  ...  the next school year is the year for exams can...\n",
+              "8   9  ...                               we won love the land\n",
+              "9  10  ...                           welcome here  im its so \n",
+              "\n",
+              "[10 rows x 4 columns]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 12
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 206
+        },
+        "id": "u01XQOAo3acQ",
+        "outputId": "3d1c98b8-dd4b-4a04-8978-f304bb3bbbd0"
+      },
+      "source": [
+        "# clean the test data and append the cleaned tweets to the test data\n",
+        "test_tweet = clean_tweets(test[\"tweet\"])\n",
+        "test_tweet = pd.DataFrame(test_tweet)\n",
+        "# append cleaned tweets to the training data\n",
+        "test[\"clean_tweet\"] = test_tweet\n",
+        "\n",
+        "# compare the cleaned and uncleaned tweets\n",
+        "test.tail()"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/html": [
+              "<div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>id</th>\n",
+              "      <th>tweet</th>\n",
+              "      <th>clean_tweet</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>17192</th>\n",
+              "      <td>49155</td>\n",
+              "      <td>thought factory: left-right polarisation! #tru...</td>\n",
+              "      <td>thought factory left right polarisation &amp;gt3</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>17193</th>\n",
+              "      <td>49156</td>\n",
+              "      <td>feeling like a mermaid ð #hairflip #neverre...</td>\n",
+              "      <td>feeling like a mermaid</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>17194</th>\n",
+              "      <td>49157</td>\n",
+              "      <td>#hillary #campaigned today in #ohio((omg)) &amp;am...</td>\n",
+              "      <td>today in omg &amp;amp used words like assets&amp;ampli...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>17195</th>\n",
+              "      <td>49158</td>\n",
+              "      <td>happy, at work conference: right mindset leads...</td>\n",
+              "      <td>happy at work conference right mindset leads t...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>17196</th>\n",
+              "      <td>49159</td>\n",
+              "      <td>my   song \"so glad\" free download!  #shoegaze ...</td>\n",
+              "      <td>my song so glad free download</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>"
+            ],
+            "text/plain": [
+              "          id  ...                                        clean_tweet\n",
+              "17192  49155  ...       thought factory left right polarisation &gt3\n",
+              "17193  49156  ...                             feeling like a mermaid\n",
+              "17194  49157  ...  today in omg &amp used words like assets&ampli...\n",
+              "17195  49158  ...  happy at work conference right mindset leads t...\n",
+              "17196  49159  ...                      my song so glad free download\n",
+              "\n",
+              "[5 rows x 3 columns]"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 13
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "7Nf9CAwH3fC8"
+      },
+      "source": [
+        "from sklearn.model_selection import train_test_split\n",
+        "\n",
+        "# extract the labels from the train data\n",
+        "y = train.label.values\n",
+        "\n",
+        "# use 70% for the training and 30% for the test\n",
+        "x_train, x_test, y_train, y_test = train_test_split(train.clean_tweet.values, y, \n",
+        "                                                    stratify=y, \n",
+        "                                                    random_state=1, \n",
+        "                                                    test_size=0.3, shuffle=True)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "3kU5Wyw83tKS"
+      },
+      "source": [
+        "from sklearn.feature_extraction.text import CountVectorizer\n",
+        "\n",
+        "# vectorize tweets for model building\n",
+        "vectorizer = CountVectorizer(binary=True, stop_words='english')\n",
+        "\n",
+        "# learn a vocabulary dictionary of all tokens in the raw documents\n",
+        "vectorizer.fit(list(x_train) + list(x_test))\n",
+        "\n",
+        "# transform documents to document-term matrix\n",
+        "x_train_vec = vectorizer.transform(x_train)\n",
+        "x_test_vec = vectorizer.transform(x_test)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "iqh3CQM13w9j"
+      },
+      "source": [
+        "from sklearn import svm\n",
+        "# classify using support vector classifier\n",
+        "svm = svm.SVC(kernel = 'linear', probability=True)\n",
+        "\n",
+        "# fit the SVC model based on the given training data\n",
+        "prob = svm.fit(x_train_vec, y_train).predict_proba(x_test_vec)\n",
+        "\n",
+        "# perform classification and prediction on samples in x_test\n",
+        "y_pred_svm = svm.predict(x_test_vec)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "5ENYU_iv30bD",
+        "outputId": "eda8c0dc-2ab4-446a-a8ab-17e1cc62298c"
+      },
+      "source": [
+        "from sklearn.metrics import accuracy_score\n",
+        "print(\"Accuracy score for SVC is: \", accuracy_score(y_test, y_pred_svm) * 100, '%')"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Accuracy score for SVC is:  94.86912086766085 %\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "qEhLmT6Q33bg"
+      },
+      "source": [
+        "def expression_check(label):\n",
+        "    if label == 0:\n",
+        "        print(\"Input statement has Negative Sentiment.\")\n",
+        "    elif label == 1:\n",
+        "        print(\"Input statement has Positive Sentiment.\")\n",
+        "    else:\n",
+        "        print(\"Invalid Statement.\")"
+      ],
+      "execution_count": 1,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "L0KkxYWw9XRu"
+      },
+      "source": [
+        ""
+      ],
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
